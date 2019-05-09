@@ -4,8 +4,8 @@ import tensorflow as tf
 import argparse
 import pickle
 import os
-from Seq2seq.model import Model
-from Seq2seq.utils import build_dict, build_dataset, batch_iter, loadVectors, buildDicFromVocab, loadData
+from model import Model
+from utils import batch_iter, buildDicFromVocab, loadData
 import numpy as np
 
 # Uncomment next 2 lines to suppress error and Tensorflow info verbosity. Or change logging levels
@@ -22,26 +22,23 @@ def add_arguments(parser):
     parser.add_argument("--learning_rate", type=float, default=1e-3, help="Learning rate.")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size.")
     parser.add_argument("--max_len", type=int, default=64, help="max len.")
-    parser.add_argument("--num_epochs", type=int, default=10, help="Number of epochs.")
+    parser.add_argument("--num_epochs", type=int, default=2000000, help="Number of epochs.")
     parser.add_argument("--keep_prob", type=float, default=0.8, help="Dropout keep prob.")
 
     parser.add_argument("--toy", action="store_true", help="Use only 50K samples of data")
 
     parser.add_argument("--with_model", action="store_true", help="Continue from previously saved model")
-    parser.add_argument("--train_x_vectors_path", type=str, default='../data/code_comment/code-100-formal.txt', help="train_x_vectors_path")
-    parser.add_argument("--train_y_vectors_path", type=str, default='../data/code_comment/comment-100-formal.txt', help="train_y_vectors_path")
 
 
 parser = argparse.ArgumentParser()
 add_arguments(parser)
 args = parser.parse_args()
-train_x_vectors_path = args.train_x_vectors_path
-train_y_vectors_path = args.train_y_vectors_path
-vocal_path = '../uncased_L-12_H-768_A-12/vocab.txt'
+
+vocal_path = '../data/config/vocab.txt'
 article_max_len = args.max_len
 summary_max_len = args.max_len
-input_path = '../data/code_comment/input.txt'
-target_path = '../data/code_comment/target.txt'
+input_path = '../data/code-100.txt'
+target_path = '../data/comment-100.txt'
 
 with open("args.pickle", "wb") as f:
     pickle.dump(args, f)
@@ -51,7 +48,7 @@ if not os.path.exists("saved_model"):
 else:
     if args.with_model:
         old_model_checkpoint_path = open('saved_model/checkpoint', 'r')
-        old_model_checkpoint_path = "".join(["saved_model/",old_model_checkpoint_path.read().splitlines()[0].split('"')[1] ])
+        old_model_checkpoint_path = "".join(["saved_model/", old_model_checkpoint_path.read().splitlines()[0].split('"')[1]])
 
 
 # print("Building dictionary...")
@@ -71,7 +68,7 @@ with tf.Session() as sess:
     saver = tf.train.Saver(tf.global_variables())
     if 'old_model_checkpoint_path' in globals():
         print("Continuing from previous trained model:" , old_model_checkpoint_path , "...")
-        saver.restore(sess, old_model_checkpoint_path )
+        saver.restore(sess, old_model_checkpoint_path)
 
     batches = batch_iter(train_x, train_y, args.batch_size, args.num_epochs)
     num_batches_per_epoch = (len(train_x) - 1) // args.batch_size + 1

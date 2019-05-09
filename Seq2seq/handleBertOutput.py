@@ -1,18 +1,20 @@
 import linecache
 import json
-import tensorflow as tf
 import random
-from tokenization import convert_tokens_to_ids, convert_ids_to_tokens
-from Seq2seq.utils import buildDicFromVocab
-import pickle
+from tokenization import convert_tokens_to_ids
+from utils import buildDicFromVocab
 def handleVectors(src_path, dst_path):
     try:
         lines = linecache.getlines(src_path)
-        out = open(dst_path, 'w')
+        out = open(dst_path, 'w+')
         for line in lines:
             line = json.loads(line)
             line = line['features'][0]['layers'][0]['values']
             print(len(line))
+            line = str(line)
+            line = line .replace('[', '')
+            line = line.replace(']', '')
+            line = line.replace(' ', '')
             out.writelines(str(line) + '\n')
     except IOError:
         print("path not found")
@@ -64,6 +66,6 @@ def convertVocab2Embeddings(train_data_path, embedding_vector_path, vocab_path, 
         embedding_vector.close()
         new_vocab_embedding.close()
 
-#handleVectors('../data/code_comment/code-100-output.json', '../data/code_comment/code-100-formal.txt')
-#buildVocabDic('../uncased_L-12_H-768_A-12/vocab.txt', '../data/code_comment/vocab_dict.txt')
-convertVocab2Embeddings('../data/code_comment/code-100.txt', '../data/code_comment/code-100-formal.txt', '../uncased_L-12_H-768_A-12/vocab.txt', '../data/code_comment/vocab_embedding.txt')
+handleVectors('../data/config/vocab-output.json', '../data/config/vocab-output-formal.txt')
+#buildVocabDic('../uncased_L-12_H-768_A-12/vocab.txt', '../data/vocab_dict.txt')
+#convertVocab2Embeddings('../data/code-100.txt', '../data/code-100-formal.txt', '../uncased_L-12_H-768_A-12/vocab.txt', '../data/vocab_embedding.txt')

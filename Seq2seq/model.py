@@ -1,9 +1,7 @@
 import tensorflow as tf
 from tensorflow.contrib import rnn
-from Seq2seq.utils import get_init_embedding
-from Seq2seq.utils import loadVectors
-import numpy as np
-embedding_path='../data/code_comment/vocab_embedding.txt'
+
+embedding_path='../data/config/vocab-output-formal.txt'
 
 class Model(object):
     def __init__(self, reversed_dict, article_max_len, summary_max_len, args, forward_only=False):
@@ -35,16 +33,12 @@ class Model(object):
             # else:
             #     init_embeddings = tf.random_uniform([self.vocabulary_size, self.embedding_size], -1.0, 1.0)
             #init_embeddings = loadVectors(embedding_path)
-            init_embeddings = open(embedding_path, 'r').read()
-            init_embeddings = init_embeddings[1: len(init_embeddings)-1]
-            init_embeddings = init_embeddings.split(',')
-            init_embeddings = [float(i[1:len(i)-1]) for i in init_embeddings]
-            embeddings = []
-            for i in range(self.embedding_size):
-                embeddings.append(np.array(init_embeddings))
-            embeddings = np.array(embeddings).T
-            #embeddings = tf.cast(embeddings, tf.float32)
-            embeddings = tf.constant(embeddings, tf.float32)
+            init_embeddings = open(embedding_path, 'r').readlines()
+            for i in range(len(init_embeddings)):
+                init_embeddings[i] = init_embeddings[i].split(',')
+                init_embeddings[i] = [float(ii) for ii in init_embeddings[i]]
+
+            embeddings = tf.Variable(init_embeddings, tf.float32)
             self.embeddings = tf.get_variable("embeddings", initializer=embeddings)
             self.encoder_emb_inp = tf.transpose(tf.nn.embedding_lookup(self.embeddings, self.X), perm=[1, 0, 2])
             self.decoder_emb_inp = tf.transpose(tf.nn.embedding_lookup(self.embeddings, self.decoder_input), perm=[1, 0, 2])

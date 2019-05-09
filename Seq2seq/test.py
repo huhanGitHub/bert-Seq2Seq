@@ -1,14 +1,14 @@
 import tensorflow as tf
 import pickle
 from Seq2seq.model import Model
-from Seq2seq.utils import build_dict, build_dataset, batch_iter, buildDicFromVocab, loadData
+from Seq2seq.utils import batch_iter, buildDicFromVocab, loadData
 import numpy as np
-vocal_path = '../uncased_L-12_H-768_A-12/vocab.txt'
-output_path='../Seq2seq/test.txt'
+vocal_path = '../data/config/vocab.txt'
+output_path='../data/test_output.txt'
 article_max_len = 64
 summary_max_len = 64
-input_path = '../data/code_comment/test.txt'
-
+input_path = '../data/code_test.txt'
+model_path = '/sda/qiuyuanchen/saved_model/'
 
 with open("args.pickle", "rb") as f:
     args = pickle.load(f)
@@ -26,7 +26,7 @@ with tf.Session() as sess:
     print("Loading saved model...")
     model = Model(reversed_dict, article_max_len, summary_max_len, args, forward_only=True)
     saver = tf.train.Saver(tf.global_variables())
-    ckpt = tf.train.get_checkpoint_state("./saved_model/")
+    ckpt = tf.train.get_checkpoint_state(model_path)
     saver.restore(sess, ckpt.model_checkpoint_path)
 
     batches = batch_iter(valid_x, [0] * len(valid_x), args.batch_size, 1)

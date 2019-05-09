@@ -7,7 +7,7 @@ from gensim.models.keyedvectors import KeyedVectors
 from gensim.test.utils import get_tmpfile
 from gensim.scripts.glove2word2vec import glove2word2vec
 
-from tokenization import convert_tokens_to_ids, convert_ids_to_tokens
+from tokenization import convert_tokens_to_ids
 
 train_article_path = "../data/sumdata/train/train.article.txt"
 train_title_path = "../data/sumdata/train/train.title.txt"

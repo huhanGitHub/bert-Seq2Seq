@@ -1,4 +1,4 @@
-beginning of an io operation that might indefinitely
+beginning                    of an io operation          that might indefinitely
 this of an io operation that might block indefinitely
 a s key
 beginning of an io operation that might indefinitely
